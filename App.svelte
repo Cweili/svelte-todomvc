@@ -29,7 +29,8 @@
 	}
 
 	function remove(index) {
-		items = items.slice(0, index).concat(items.slice(index + 1));
+		items.splice(index, 1);
+		items = items;
 	}
 
 	function toggleAll(event) {
@@ -42,11 +43,12 @@
 
 	function createNew(event) {
 		if (event.which === ENTER_KEY) {
-			items = items.concat({
+			items.push({
 				id: uuid(),
 				description: event.target.value,
 				completed: false
 			});
+			items = items;
 			event.target.value = '';
 		}
 	}
@@ -70,13 +72,11 @@
 
 	$: filtered = currentFilter === 'all'
 		? items
-		: currentFilter === 'completed'
-			? items.filter(item => item.completed)
-			: items.filter(item => !item.completed);
+		: items.filter(item => currentFilter === 'completed' ? item.completed : !item.completed)
 
 	$: numActive = items.filter(item => !item.completed).length;
 
-	$: numCompleted = items.filter(item => item.completed).length;
+	$: numCompleted = items.length - numActive;
 
 	$: try {
 		localStorage.setItem('todos-svelte', JSON.stringify(items));
